@@ -1,9 +1,4 @@
-// autobind decorator
-export function autobind(
-    _1: any, 
-    _2: string, 
-    descriptor: PropertyDescriptor
-) {
+export function autobind(_1, _2, descriptor) {
     const originalMethod = descriptor.value;
     const adjDescriptor = {
         configurable: true,
@@ -11,6 +6,7 @@ export function autobind(
             const boundFn = originalMethod.bind(this);
             return boundFn;
         }
-    }
+    };
     return adjDescriptor;
 }
+//# sourceMappingURL=autobind.js.map
