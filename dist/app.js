@@ -7,8 +7,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var ProjectStatus;
 (function (ProjectStatus) {
-    ProjectStatus[ProjectStatus["Active"] = 0] = "Active";
-    ProjectStatus[ProjectStatus["Finished"] = 1] = "Finished";
+    ProjectStatus[ProjectStatus["ToDo"] = 0] = "ToDo";
+    ProjectStatus[ProjectStatus["Active"] = 1] = "Active";
+    ProjectStatus[ProjectStatus["Qa"] = 2] = "Qa";
+    ProjectStatus[ProjectStatus["Finished"] = 3] = "Finished";
 })(ProjectStatus || (ProjectStatus = {}));
 class Project {
     constructor(id, title, description, people, status) {
@@ -40,7 +42,7 @@ class ProjectState extends State {
         return this.instance;
     }
     addProject(title, description, numOfPeople) {
-        const newProject = new Project(Math.random().toString(), title, description, numOfPeople, ProjectStatus.Active);
+        const newProject = new Project(Math.random().toString(), title, description, numOfPeople, ProjectStatus.ToDo);
         this.projects.push(newProject);
         this.updateListeners();
     }
@@ -141,7 +143,7 @@ __decorate([
 ], ProjectItem.prototype, "dragStartHandler", null);
 class ProjectList extends Component {
     constructor(type) {
-        super('project-list', 'app', false, `${type}-projects`);
+        super('project-list', 'swimlanes', false, `${type}-projects`);
         this.type = type;
         this.assignedProjects = [];
         this.configure();
@@ -160,7 +162,17 @@ class ProjectList extends Component {
     }
     dropHandler(event) {
         const prjId = event.dataTransfer.getData('text/plain');
-        projectState.moveProject(prjId, this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished);
+        let status = ProjectStatus.ToDo;
+        if (this.type === 'active') {
+            status = ProjectStatus.Active;
+        }
+        if (this.type === 'qa') {
+            status = ProjectStatus.Qa;
+        }
+        if (this.type === 'finished') {
+            status = ProjectStatus.Finished;
+        }
+        projectState.moveProject(prjId, status);
     }
     configure() {
         this.element.addEventListener('dragover', this.dragOverHandler);
@@ -168,8 +180,14 @@ class ProjectList extends Component {
         this.element.addEventListener('drop', this.dropHandler);
         projectState.addListener((projects) => {
             const relevantProjects = projects.filter(prj => {
-                if (this.type === 'active') {
+                if (this.type === 'todo') {
+                    return prj.status === ProjectStatus.ToDo;
+                }
+                else if (this.type === 'active') {
                     return prj.status === ProjectStatus.Active;
+                }
+                else if (this.type === 'qa') {
+                    return prj.status === ProjectStatus.Qa;
                 }
                 else {
                     return prj.status === ProjectStatus.Finished;
@@ -182,7 +200,7 @@ class ProjectList extends Component {
     renderContent() {
         const listId = `${this.type}-projects-list`;
         this.element.querySelector('ul').id = listId;
-        this.element.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
+        this.element.querySelector('h2').textContent = this.type.toUpperCase();
     }
     renderProjects() {
         const listEl = document.getElementById(`${this.type}-projects-list`);
@@ -203,7 +221,7 @@ __decorate([
 ], ProjectList.prototype, "dropHandler", null);
 class ProjectInput extends Component {
     constructor() {
-        super('project-input', 'app', true, 'user-input');
+        super('project-input', 'app', false, 'user-input');
         this.titleInputElement = this.element.querySelector('#title');
         this.descriptionInputElement = this.element.querySelector('#description');
         this.peopleInputElement = this.element.querySelector('#people');
@@ -260,7 +278,9 @@ class ProjectInput extends Component {
 __decorate([
     autobind
 ], ProjectInput.prototype, "submitHandler", null);
-const prjInput = new ProjectInput();
+const todoPrjList = new ProjectList('todo');
 const activePrjList = new ProjectList('active');
+const qaPrjList = new ProjectList('qa');
 const finishedPrjList = new ProjectList('finished');
+const prjInput = new ProjectInput();
 //# sourceMappingURL=app.js.map

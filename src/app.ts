@@ -12,7 +12,9 @@ interface DragTarget {
 
 // project custom type
 enum ProjectStatus {
+    ToDo,
     Active,
+    Qa,
     Finished
 }
 class Project {
@@ -59,7 +61,7 @@ class ProjectState extends State<Project> {
             title,
             description,
             numOfPeople,
-            ProjectStatus.Active
+            ProjectStatus.ToDo
         )
 
         this.projects.push(newProject);
@@ -216,8 +218,8 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
 
     assignedProjects: Project[];
 
-    constructor(private type: 'active' | 'finished') {
-        super('project-list', 'app', false, `${type}-projects`);
+    constructor(private type: 'todo' | 'active' | 'qa' | 'finished') {
+        super('project-list', 'swimlanes', false, `${type}-projects`);
 
         this.assignedProjects = [];
 
@@ -243,7 +245,21 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
     @autobind
     dropHandler(event: DragEvent) {
         const prjId = event.dataTransfer!.getData('text/plain');
-        projectState.moveProject(prjId, this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished)
+        let status: ProjectStatus = ProjectStatus.ToDo;
+
+        if (this.type === 'active') {
+            status = ProjectStatus.Active;
+        }
+
+        if (this.type === 'qa') {
+            status = ProjectStatus.Qa;
+        }
+
+        if (this.type === 'finished') {
+            status = ProjectStatus.Finished;
+        }
+
+        projectState.moveProject(prjId, status)
     }
 
     configure() {
@@ -253,8 +269,12 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
 
         projectState.addListener((projects: Project[]) => {
             const relevantProjects = projects.filter(prj => {
-                if (this.type === 'active') {
+                if (this.type === 'todo') {
+                    return prj.status === ProjectStatus.ToDo;
+                } else if (this.type === 'active') {
                     return prj.status === ProjectStatus.Active;
+                } else if (this.type === 'qa') {
+                    return prj.status === ProjectStatus.Qa;
                 } else {
                     return prj.status === ProjectStatus.Finished;
                 }
@@ -267,7 +287,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
     renderContent() {
         const listId = `${this.type}-projects-list`;
         this.element.querySelector('ul')!.id = listId;
-        this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS'
+        this.element.querySelector('h2')!.textContent = this.type.toUpperCase()
     }
 
     private renderProjects() {
@@ -286,7 +306,7 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     peopleInputElement: HTMLInputElement;
 
     constructor() {
-        super('project-input', 'app', true, 'user-input');
+        super('project-input', 'app', false, 'user-input');
      
         // get access to inputs
         this.titleInputElement = this.element.querySelector('#title') as HTMLInputElement;
@@ -356,6 +376,8 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     }
 }
 
-const prjInput = new ProjectInput();
+const todoPrjList = new ProjectList('todo');
 const activePrjList = new ProjectList('active');
+const qaPrjList = new ProjectList('qa');
 const finishedPrjList = new ProjectList('finished');
+const prjInput = new ProjectInput();

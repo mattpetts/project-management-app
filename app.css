@@ -8,6 +8,7 @@
   
   body {
     margin: 0;
+    background-color: #000000;
   }
   
   label,
@@ -19,6 +20,7 @@
   
   label {
     font-weight: bold;
+    color: white;
   }
   
   input,
@@ -26,8 +28,10 @@
     font: inherit;
     padding: 0.2rem 0.4rem;
     width: 100%;
-    max-width: 30rem;
     border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    height: 50px;
   }
   
   input:focus,
@@ -38,11 +42,15 @@
   
   button {
     font: inherit;
-    background: #ff0062;
-    border: 1px solid #ff0062;
+    background: #fca311;
+    border: 1px solid #fca311;
     cursor: pointer;
     color: white;
     padding: 0.75rem 1rem;
+    border-radius: 10px;
+    width: 100%;
+    height: 50px;
+    margin-top: 20px;
   }
   
   button:focus {
@@ -51,30 +59,37 @@
   
   button:hover,
   button:active {
-    background: #a80041;
-    border-color: #a80041;
+    background: #f49906;
+    border-color: #f49906;
+  }
+
+  #swimlanes {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
   }
   
   .projects {
     margin: 1rem;
-    border: 1px solid #ff0062;
+    background: #14213d;
+    width: 100%;
+    border-radius: 10px;
+    display: block;
+    height: 500px;
+    overflow: auto;
+    position: relative;
   }
   
   .projects header {
-    background: #ff0062;
     height: 3.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: transparent;
+    position: absolute;
+    width: 100%;
   }
   
-  #finished-projects {
-    border-color: #0044ff;
-  }
-  
-  #finished-projects header {
-    background: #0044ff;
-  }
   
   .projects h2 {
     margin: 0;
@@ -85,6 +100,9 @@
     list-style: none;
     margin: 0;
     padding: 1rem;
+    min-height: 100%;
+    height: fit-content;
+    padding-top: 3.5rem;
   }
   
   .projects li {
@@ -92,15 +110,12 @@
     padding: 1rem;
     margin: 1rem;
     background-color: white;
+    border-radius: 10px;
   }
   
   .projects li h2 {
-    color: #ff0062;
     margin: 0.5rem 0;
-  }
-  
-  #finished-projects li h2 {
-    color: #0044ff;
+    color: #575757;
   }
   
   .projects li h3 {
@@ -113,17 +128,13 @@
   }
   
   .droppable {
-    background: #ffe3ee;
+    background: #fca311;
   }
   
-  #finished-projects .droppable {
-    background: #d6e1ff;
-  }
   
   #user-input {
     margin: 1rem;
     padding: 1rem;
-    border: 1px solid #ff0062;
-    background: #f7f7f7;
+    background: #14213d;
   }
   
